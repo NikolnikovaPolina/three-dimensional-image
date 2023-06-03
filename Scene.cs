@@ -17,7 +17,6 @@ namespace _2eab
         public List<Point> verts;
         public List<Triangle> polys;
         public Point lightPoint;
-        double[,] Zbuffer;
 
         public Scene(int height, int width)
         {
@@ -30,7 +29,7 @@ namespace _2eab
 
         public void addCone(double radius, double height)
         {
-            int h = 10; // шаг по окружности, в градусах
+            int h = 1; // шаг по окружности, в градусах
             List<Point> circle = new List<Point>(); // Окружность при z=0
             for (int i = 0; i < 360; i += h)
             {
@@ -80,13 +79,13 @@ namespace _2eab
             v0 = new Point(pnt).minus(new Point(pnts[0]));
             v1 = new Point(pnts[1]).minus(new Point(pnts[0]));
             v2 = new Point(pnts[2]).minus(new Point(pnts[0]));
-            if (Math.Abs(v2.findAngle(v1) - v2.findAngle(v0) - v1.findAngle(v0)) > 1e-3)
+            if (Math.Abs(v2.findAngle(v1) - v2.findAngle(v0) - v1.findAngle(v0)) >= 1e-3)
                 return false;
 
             v0 = new Point(pnt).minus(new Point(pnts[1]));
             v1 = new Point(pnts[0]).minus(new Point(pnts[1]));
             v2 = new Point(pnts[2]).minus(new Point(pnts[1]));
-            if (Math.Abs(v2.findAngle(v1) - v2.findAngle(v0) - v1.findAngle(v0)) > 1e-3)
+            if (Math.Abs(v2.findAngle(v1) - v2.findAngle(v0) - v1.findAngle(v0)) >= 1e-3)
                 return false;
 
             return true;
@@ -150,11 +149,7 @@ namespace _2eab
                     if (CheckPoint(curp, pnts))
                     {
                         Point curV = findVertex(curp, poly);
-                        if (curV.getZ() < Zbuffer[X, Y])
-                        {
-                            Zbuffer[X, Y] = curV.getZ();
-                            pic.SetPixel(X, Y, colorWithLight(curV, poly));
-                        }
+                        pic.SetPixel(X, Y, colorWithLight(curV, poly));
                     }
                 }
         }
@@ -169,11 +164,7 @@ namespace _2eab
                 lightPoint.rotateForCam(cam);
                 Graphics gr = Graphics.FromImage(pic);
                 gr.Clear(Color.White);
-                Zbuffer = new double[width, height];
-                for (int i = 0; i < width; i++)
-                    for (int j = 0; j < height; j++)
-                        Zbuffer[i, j] = 10000;  //устанавливаем линию горизонта
-
+                
                 foreach (Triangle pl in polys)
                     if (pl.v0.minus(cam.pos).findAngle(pl.normal) > Math.PI / 2)  //если плоскость смотрит в сторону камеры
                         if (pl.v0.Vcam.getZ() > 0.2 && pl.v1.Vcam.getZ() > 0.2 && pl.v2.Vcam.getZ() > 0.2) //и если она не лежит за ней
