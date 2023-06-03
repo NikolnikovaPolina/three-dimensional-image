@@ -38,14 +38,23 @@ namespace _2eab
                 circle.Add(new Point(radius * Math.Cos(rad), radius * Math.Sin(rad), 0));
             }
 
+            verts.Add(new Point(0, 0, 0));
+
+            for (int i = 0; i < circle.Count - 1; i++)
+            {
+                polys.Add(new Triangle(circle[i + 1], circle[i], verts[0], brush));
+            }
+
+            polys.Add(new Triangle(circle[0], circle[circle.Count - 1], verts[0], brush));
+            
             verts.Add(new Point(0, 0, height));
 
             for (int i = 0; i < circle.Count - 1; i++)
             {
-                polys.Add(new Triangle(circle[i], circle[i + 1], verts[0], brush));
+                polys.Add(new Triangle(circle[i], circle[i + 1], verts[1], brush));
             }
 
-            polys.Add(new Triangle(circle[circle.Count - 1], circle[0], verts[0], brush));
+            polys.Add(new Triangle(circle[circle.Count - 1], circle[0], verts[1], brush));
 
             verts.AddRange(circle);          
         }
